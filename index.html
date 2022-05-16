@@ -22,8 +22,8 @@
       .highcharts-figure,
     .highcharts-data-table table {
         min-width: 360px;
-        /* max-width: 800px; */
-        margin: 3em auto;
+        width: 90%;
+        margin: 1em auto;
     }
 
     .highcharts-data-table table {
@@ -90,7 +90,7 @@
           /* background-color: azure; */
           font-family: Verdana, sans-serif;
           text-align: center;
-          font-size: xx-large;
+          font-size: x-large;
           font-weight: bold;
       }
   </style>
@@ -114,11 +114,12 @@
 
 <figure class="highcharts-figure">
     <div id="container"></div>
-    <!-- <p class="highcharts-description">
-        Highcharts has extensive support for time series, and will adapt
-        intelligently to the input data. Click and drag in the chart to zoom in
-        and inspect the data.
-    </p> -->
+    <!-- Highcharts chart for pricing information -->
+</figure>
+
+<figure class="highcharts-figure">
+    <div id="container2"></div>
+    <!-- Highcharts chart for input information -->
 </figure>
 
 <hr>
@@ -195,6 +196,18 @@
 
 
     }
+
+    function syncG1(e) {
+        if (e.trigger == 'syncG2') {return;}
+        var extremes = g2.xAxis[0].getExtremes();
+        g.xAxis[0].setExtremes(extremes.min, extremes.max);
+    }
+
+    function syncG2(e) {
+        if (e.trigger == 'syncG1') {return;}
+        var extremes = g.xAxis[0].getExtremes();
+        g2.xAxis[0].setExtremes(extremes.min, extremes.max);
+    }
 </script>
 
 
@@ -203,37 +216,35 @@
     g = Highcharts.chart('container', {
         
         chart: {
+            marginLeft: 100,
+            marginRight: 200,
             zoomType: 'x',
             events: {
                 redraw: calcError
             }
         },
         title: {
-            text: 'Comparison Graph:'
+            text: 'Price Comparison Graph:',
+            style: {"fontSize": "17px" }
         },
         subtitle: {
             text: document.ontouchstart === undefined ?
-                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in'
+                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in',
+            style: {"fontSize": "10px" }
+
         },
         xAxis: {
-            type: 'datetime'
+            type: 'datetime',
+            visible: 'false',
+            events: {
+                afterSetExtremes: syncG2
+            }//,
+        //     labels: {
+        //         enabled: false
+        //     }
         },
 
         yAxis: [{
-            //load axis
-                labels: {
-                format: '{value} MW',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
-            },
-            title: {
-                text: 'Load (MW)',
-                style: {
-                    color: Highcharts.getOptions().colors[1]
-                }
-            },
-            }, {
                 //price axis
                 labels: {
                 format: '${value}',
@@ -249,9 +260,6 @@
             }
         }],
 
-        legend: {
-            enabled: false
-        },
         legend: {
         layout: 'vertical',
         align: 'right',
@@ -286,22 +294,96 @@
 
         series: [{
             yAxis: 0,
-            name: 'Load',
-            data: toUnixMillis(loadData)
-        }, {
-            yAxis: 1,
             name: 'Our Predicted Price',
             data: toUnixMillis(priceOursData)
         }, {
-            yAxis: 1,
+            yAxis: 0,
             name: 'Actual Price',
             data: toUnixMillis(priceActualData)
         }, {
-            yAxis: 1,
+            yAxis: 0,
             name: 'Utility Predicted Price',
             data: toUnixMillis(priceTheirsData)        
         }]
         
+    });
+
+    g2 = Highcharts.chart('container2', {
+        
+        chart: {
+            marginLeft: 100,
+            marginRight: 200,
+            zoomType: 'x'
+        },
+        title: {
+            text: 'Inputs Graph:',
+            style: {"fontSize": "17px" }
+        },
+        subtitle: {
+            text: document.ontouchstart === undefined ?
+                'Click and drag in the plot area to zoom in' : 'Pinch the chart to zoom in',
+            style: {"fontSize": "10px" }
+        },
+        xAxis: {
+            type: 'datetime',
+            events: {
+                afterSetExtremes: syncG1
+            }
+        },
+
+        yAxis: [{
+            //load axis
+                labels: {
+                format: '{value} MW',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            },
+            title: {
+                text: 'Load (MW)',
+                style: {
+                    color: Highcharts.getOptions().colors[1]
+                }
+            }
+        }],
+
+        legend: {
+        layout: 'vertical',
+        align: 'right',
+        verticalAlign: 'middle'
+        },
+        plotOptions: {
+            area: {
+                fillColor: {
+                    linearGradient: {
+                        x1: 0,
+                        y1: 0,
+                        x2: 0,
+                        y2: 1
+                    },
+                    stops: [
+                        [0, Highcharts.getOptions().colors[0]],
+                        [1, Highcharts.color(Highcharts.getOptions().colors[0]).setOpacity(0).get('rgba')]
+                    ]
+                },
+                marker: {
+                    radius: 2
+                },
+                lineWidth: 1,
+                states: {
+                    hover: {
+                        lineWidth: 1
+                    }
+                },
+                threshold: null
+            }
+        },
+
+        series: [{
+            yAxis: 0,
+            name: 'Total Grid Load',
+            data: toUnixMillis(loadData)
+        }]        
     });
 
 
