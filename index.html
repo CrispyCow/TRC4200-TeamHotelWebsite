@@ -136,10 +136,10 @@
     <!-- <div></div> -->
   </div>
 
-<script src="./loadActual.js"></script>
-<script src="./loadForecast.js"></script>
+<script src="./load.js"></script>
+<script src="./priceOurs.js"></script>
 <script src="./priceActual.js"></script>
-<script src="./priceDayAhead.js"></script>
+<script src="./priceTheirs.js"></script>
 
 <script> // Script with Functions
 
@@ -243,20 +243,20 @@
 
         series: [{
             yAxis: 0,
-            name: 'Actual Load',
-            data: toUnixMillis(loadActualData)
+            name: 'Load',
+            data: toUnixMillis(loadData)
         }, {
-            yAxis: 0,
-            name: 'Forecasted Load',
-            data: toUnixMillis(loadForecastData)
+            yAxis: 1,
+            name: 'Our Predicted Price',
+            data: toUnixMillis(priceOursData)
         }, {
             yAxis: 1,
             name: 'Actual Price',
             data: toUnixMillis(priceActualData)
         }, {
             yAxis: 1,
-            name: 'Forecasted Price',
-            data: toUnixMillis(priceDayAheadData)        
+            name: 'Utility Predicted Price',
+            data: toUnixMillis(priceTheirsData)        
         }]
     });
 
