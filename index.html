@@ -153,12 +153,23 @@
 <script src="./priceOurs.js"></script>
 <script src="./priceActual.js"></script>
 <script src="./priceTheirs.js"></script>
+<script src="./weatherTemp.js"></script>
+<script src="./weatherCloud.js"></script>
+<script src="./weatherWindSpeed.js"></script>
 
 <script> // Script with Functions
 
     function toUnixMillis(arr) { // convert from unix seconds to unix millis
         arr.forEach((value, index) => {
             arr[index][0] *= 1000;
+        });
+        return  arr;
+    }
+
+    function toUnixMillisPlusTemp(arr) { // convert from unix seconds to unix millis and convert temp from kelvin to celcius
+        arr.forEach((value, index) => {
+            arr[index][0] *= 1000;
+            arr[index][1] += -273.15;
         });
         return  arr;
     }
@@ -336,13 +347,55 @@
                 labels: {
                 format: '{value} MW',
                 style: {
-                    color: Highcharts.getOptions().colors[1]
+                    color: Highcharts.getOptions().colors[3]
                 }
             },
             title: {
                 text: 'Load (MW)',
                 style: {
-                    color: Highcharts.getOptions().colors[1]
+                    color: Highcharts.getOptions().colors[3]
+                }
+            }
+        },{
+            //temperature axis
+            labels: {
+                format: '{value} °C',
+                style: {
+                    color: Highcharts.getOptions().colors[4]
+                }
+            },
+            title: {
+                text: 'Temperature (°C)',
+                style: {
+                    color: Highcharts.getOptions().colors[4]
+                }
+            }
+        },{
+            //wind speed axis
+            labels: {
+                format: '{value} Km/h',
+                style: {
+                    color: Highcharts.getOptions().colors[5]
+                }
+            },
+            title: {
+                text: 'Wind Speed (Km/h)',
+                style: {
+                    color: Highcharts.getOptions().colors[5]
+                }
+            }
+        },{
+            //cloud cover axis
+            labels: {
+                format: '{value}%',
+                style: {
+                    color: Highcharts.getOptions().colors[6]
+                }
+            },
+            title: {
+                text: 'Cloud Cover (%)',
+                style: {
+                    color: Highcharts.getOptions().colors[6]
                 }
             }
         }],
@@ -383,6 +436,18 @@
             yAxis: 0,
             name: 'Total Grid Load',
             data: toUnixMillis(loadData)
+        },{
+            yAxis: 1,
+            name: 'Temperature',
+            data: toUnixMillisPlusTemp(weatherTempData)
+        },{
+            yAxis: 3,
+            name: 'Cloud Cover',
+            data: toUnixMillis(weatherCloudData)
+        },{
+            yAxis: 2,
+            name: 'Wind Speed',
+            data: toUnixMillis(weatherWindSpeedData)
         }]        
     });
 
